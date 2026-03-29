@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "QuiverCalc",
-    "slug": "QuiverCalc",
+    "slug": "quivercalc",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -34,6 +34,13 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "c1e4915d-b00f-406b-9be0-94e98aed7b96"
+      }
+    },
+    "owner": "pgarr"
   }
 }
