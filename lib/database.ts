@@ -31,11 +31,12 @@ export function createTraining(input: {
   scores?: number[];
 }) {
   const scoresJson = JSON.stringify(input.scores ?? []);
+  const createdAt = new Date().toISOString();
 
   const result = db.runSync(
-    `INSERT INTO trainings (distance, arrows_per_round, count_points, scores)
-     VALUES (?, ?, ?, ?);`,
-    [input.distance, input.arrowsPerRound, input.countPoints ? 1 : 0, scoresJson]
+    `INSERT INTO trainings (distance, arrows_per_round, count_points, scores, created_at)
+     VALUES (?, ?, ?, ?, ?);`,
+    [input.distance, input.arrowsPerRound, input.countPoints ? 1 : 0, scoresJson, createdAt]
   );
   return result.lastInsertRowId;
 }
