@@ -1,3 +1,4 @@
+import { TrainingScoreButton } from '@/components/training-score-button';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { deleteTraining, initDatabase, updateTrainingScores } from '@/lib/database';
@@ -5,7 +6,7 @@ import { POINT_OPTIONS, type PointOption } from '@/lib/training-points';
 import { buildTrainingScoresPayload, type PointsRoundSummary } from '@/lib/training-scores';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { Alert, ScrollView, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, View } from 'react-native';
 
 export default function TrainingInProgressScreen() {
   const router = useRouter();
@@ -129,14 +130,9 @@ export default function TrainingInProgressScreen() {
 
         {isCountPointsEnabled ? (
           <>
-            <View className="mt-4 flex-row flex-wrap gap-2">
+            <View style={styles.scoreButtonRow}>
               {POINT_OPTIONS.map((option) => (
-                <Button
-                  key={`point-${option.label}`}
-                  onPress={() => onPointShot(option)}
-                  className={`size-14 rounded-full ${option.backgroundClassName}`}>
-                  <Text className={option.textClassName}>{option.label}</Text>
-                </Button>
+                <TrainingScoreButton key={`point-${option.label}`} option={option} onPress={() => onPointShot(option)} />
               ))}
             </View>
 
@@ -197,3 +193,12 @@ export default function TrainingInProgressScreen() {
     </>
   );
 }
+
+const styles = StyleSheet.create({
+  scoreButtonRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: 16,
+    gap: 8,
+  },
+});
