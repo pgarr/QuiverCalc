@@ -40,7 +40,7 @@ export default function HomeScreen() {
             </Text>
           }
           renderItem={({ item }) => {
-            const { totalShots, avgPointsPerRound } = getTrainingListStats(item);
+            const { totalShots, avgPointsPerShot: avgPointsPerRound } = getTrainingListStats(item);
             const showAvg = item.countPoints === 1 && avgPointsPerRound != null;
 
             return (
@@ -51,9 +51,7 @@ export default function HomeScreen() {
                 </Text>
                 <Text variant="muted">Total shots: {totalShots}</Text>
                 {showAvg ? (
-                  <Text variant="muted">
-                    Avg points / round: {avgPointsPerRound.toFixed(1)}
-                  </Text>
+                  <Text variant="muted">Avg points / round: {avgPointsPerRound.toFixed(1)}</Text>
                 ) : null}
               </View>
             );

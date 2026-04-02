@@ -1,11 +1,17 @@
 import * as SQLite from 'expo-sqlite';
 
+export type RoundSummary = {
+  roundNumber: number;
+  shotsTaken: number;
+  shotsScores?: number[];
+};
+
 export type TrainingRecord = {
   id: number;
   distance: number;
   arrowsPerRound: number;
   countPoints: number;
-  scores: string;
+  rounds: RoundSummary[];
   createdAt: string;
 };
 
@@ -18,7 +24,7 @@ export function initDatabase() {
       distance REAL NOT NULL,
       arrows_per_round INTEGER NOT NULL,
       count_points INTEGER NOT NULL,
-      scores TEXT NOT NULL DEFAULT '[]',
+      rounds TEXT NOT NULL DEFAULT '{}',
       created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
     );
   `);
@@ -28,15 +34,15 @@ export function createTraining(input: {
   distance: number;
   arrowsPerRound: number;
   countPoints: boolean;
-  scores?: number[];
+  rounds?: RoundSummary[];
 }) {
-  const scoresJson = JSON.stringify(input.scores ?? []);
+  const roundsJson = JSON.stringify(input.rounds ?? {});
   const createdAt = new Date().toISOString();
 
   const result = db.runSync(
-    `INSERT INTO trainings (distance, arrows_per_round, count_points, scores, created_at)
+    `INSERT INTO trainings (distance, arrows_per_round, count_points, rounds, created_at)
      VALUES (?, ?, ?, ?, ?);`,
-    [input.distance, input.arrowsPerRound, input.countPoints ? 1 : 0, scoresJson, createdAt]
+    [input.distance, input.arrowsPerRound, input.countPoints ? 1 : 0, roundsJson, createdAt]
   );
   return result.lastInsertRowId;
 }
@@ -45,20 +51,26 @@ export function deleteTraining(id: number) {
   db.runSync(`DELETE FROM trainings WHERE id = ?`, [id]);
 }
 
-export function updateTrainingScores(id: number, scoresJson: string) {
-  db.runSync(`UPDATE trainings SET scores = ? WHERE id = ?`, [scoresJson, id]);
+export function updateTrainingRounds(id: number, rounds: RoundSummary[]) {
+  const roundsJson = JSON.stringify(rounds ?? {});
+  db.runSync(`UPDATE trainings SET rounds = ? WHERE id = ?`, [roundsJson, id]);
 }
 
 export function getTrainings(): TrainingRecord[] {
-  return db.getAllSync<TrainingRecord>(
-    `SELECT
+  return db
+    .getAllSync<TrainingRecord>(
+      `SELECT
       id,
       distance,
       arrows_per_round as arrowsPerRound,
       count_points as countPoints,
-      scores,
+      rounds,
       created_at as createdAt
      FROM trainings
      ORDER BY id DESC;`
-  );
+    )
+    .map((record) => ({
+      ...record,
+      rounds: typeof record.rounds === 'string' ? JSON.parse(record.rounds) : record.rounds,
+    }));
 }

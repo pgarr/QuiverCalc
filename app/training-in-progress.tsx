@@ -1,12 +1,12 @@
-import { TrainingScoreButton } from '@/components/training-score-button';
+import { RoundNoPoints } from '@/components/round-no-points';
+import { RoundPoints } from '@/components/round-points';
+import { TrainingFooter } from '@/components/training-footer';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
-import { deleteTraining, initDatabase, updateTrainingScores } from '@/lib/database';
-import { POINT_OPTIONS, type PointOption } from '@/lib/training-points';
-import { buildTrainingScoresPayload, type PointsRoundSummary } from '@/lib/training-scores';
+import { deleteTraining, initDatabase, RoundSummary, updateTrainingRounds } from '@/lib/database';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { Alert, ScrollView, StyleSheet, View } from 'react-native';
+import { Alert, ScrollView, View } from 'react-native';
 
 export default function TrainingInProgressScreen() {
   const router = useRouter();
@@ -20,10 +20,8 @@ export default function TrainingInProgressScreen() {
   const trainingId = params.trainingId ? Number(params.trainingId) : NaN;
 
   const isCountPointsEnabled = params.countPoints === '1';
-  const [noPointsRounds, setNoPointsRounds] = useState<{ roundNumber: number; arrowsShot: number }[]>([]);
-  const [currentRoundShots, setCurrentRoundShots] = useState<PointOption[]>([]);
-  const [completedRounds, setCompletedRounds] = useState<PointsRoundSummary[]>([]);
-  const [totalArrowsShotPoints, setTotalArrowsShotPoints] = useState(0);
+  const [completedRounds, setCompletedRounds] = useState<RoundSummary[]>([]);
+  const [totalArrowsShot, setTotalArrowsShot] = useState(0);
 
   const arrowsPerRound = useMemo(() => {
     const parsedValue = Number(params.arrowsPerRound);
@@ -32,51 +30,6 @@ export default function TrainingInProgressScreen() {
     }
     return parsedValue;
   }, [params.arrowsPerRound]);
-
-  const roundButtons = useMemo(() => {
-    if (arrowsPerRound <= 0) {
-      return [];
-    }
-
-    // Most common value first: +N, then +N-1 ... +1
-    return Array.from({ length: arrowsPerRound }, (_, index) => arrowsPerRound - index);
-  }, [arrowsPerRound]);
-
-  const onRoundCompleted = (arrowsShotInRound: number) => {
-    setNoPointsRounds((prev) => [
-      ...prev,
-      { roundNumber: prev.length + 1, arrowsShot: arrowsShotInRound },
-    ]);
-  };
-
-  const roundsPassedNoPoints = noPointsRounds.length;
-  const totalArrowsShotNoPoints = useMemo(
-    () => noPointsRounds.reduce((sum, r) => sum + r.arrowsShot, 0),
-    [noPointsRounds]
-  );
-
-  const onPointShot = (selectedOption: PointOption) => {
-    if (arrowsPerRound <= 0) {
-      return;
-    }
-
-    const nextShots = [...currentRoundShots, selectedOption];
-    setCurrentRoundShots(nextShots);
-    setTotalArrowsShotPoints((prev) => prev + 1);
-
-    if (nextShots.length === arrowsPerRound) {
-      const roundTotalScore = nextShots.reduce((sum, shot) => sum + shot.value, 0);
-      setCompletedRounds((prev) => [
-        ...prev,
-        {
-          roundNumber: prev.length + 1,
-          totalScore: roundTotalScore,
-          shots: nextShots.map((shot) => shot.label),
-        },
-      ]);
-      setCurrentRoundShots([]);
-    }
-  };
 
   const onCancelTraining = () => {
     Alert.alert('Cancel training', 'This training will be removed from your history. Continue?', [
@@ -108,12 +61,8 @@ export default function TrainingInProgressScreen() {
     }
     try {
       initDatabase();
-      const payload = buildTrainingScoresPayload(
-        isCountPointsEnabled,
-        completedRounds,
-        noPointsRounds
-      );
-      updateTrainingScores(trainingId, JSON.stringify(payload));
+      updateTrainingRounds(trainingId, completedRounds);
+
       router.replace('/');
     } catch {
       Alert.alert('Error', 'Could not save training.');
@@ -130,56 +79,53 @@ export default function TrainingInProgressScreen() {
 
         {isCountPointsEnabled ? (
           <>
-            <View style={styles.scoreButtonRow}>
-              {POINT_OPTIONS.map((option) => (
-                <TrainingScoreButton key={`point-${option.label}`} option={option} onPress={() => onPointShot(option)} />
-              ))}
-            </View>
+            <RoundPoints
+              arrowsPerRound={arrowsPerRound}
+              onRoundCompleted={(scores) => {
+                const newRound: RoundSummary = {
+                  roundNumber: completedRounds.length + 1,
+                  shotsTaken: scores.length,
+                  shotsScores: scores,
+                };
 
-            <Text variant="muted" className="mt-2">
-              Current round: {currentRoundShots.length}/{arrowsPerRound || '-'} shots
-            </Text>
+                setCompletedRounds((prev) => [...prev, newRound]);
+                setTotalArrowsShot((prev) => prev + scores.length);
+              }}
+            />
 
             <ScrollView className="mt-3 flex-1 rounded-md border border-border p-3">
               {completedRounds.length === 0 ? (
                 <Text variant="muted">No completed rounds yet.</Text>
               ) : (
                 completedRounds.map((round) => (
-                  <View key={`completed-round-${round.roundNumber}`} className="mb-3 rounded-md border border-border p-3">
+                  <View
+                    key={`completed-round-${round.roundNumber}`}
+                    className="mb-3 rounded-md border border-border p-3">
                     <Text>Round {round.roundNumber}</Text>
-                    <Text variant="muted">Total score: {round.totalScore}</Text>
-                    <Text variant="muted">Shots: {round.shots.join(', ')}</Text>
+                    <Text variant="muted">
+                      Total score:
+                      {round.shotsScores?.reduce((sum, score) => sum + score, 0) ?? '-'}
+                    </Text>
+                    <Text variant="muted">Shots: {round.shotsScores?.join(', ') ?? '-'}</Text>
                   </View>
                 ))
               )}
             </ScrollView>
-
-            <View className="mt-3 rounded-md border border-border p-4">
-              <Text variant="muted">Rounds passed: {completedRounds.length}</Text>
-              <Text variant="muted">Total arrows shot: {totalArrowsShotPoints}</Text>
-            </View>
           </>
         ) : (
-          <>
-            <View className="mt-4 flex-row flex-wrap gap-2">
-              {roundButtons.map((buttonValue, index) => (
-                <Button
-                  key={`round-value-${buttonValue}`}
-                  variant={index === 0 ? 'default' : 'secondary'}
-                  size="icon"
-                  className="size-14 rounded-full"
-                  onPress={() => onRoundCompleted(buttonValue)}>
-                  <Text>{`+${buttonValue}`}</Text>
-                </Button>
-              ))}
-            </View>
-
-            <View className="mt-2 rounded-md border border-border p-4">
-              <Text variant="muted">Rounds passed: {roundsPassedNoPoints}</Text>
-              <Text variant="muted">Total arrows shot: {totalArrowsShotNoPoints}</Text>
-            </View>
-          </>
+          <RoundNoPoints
+            onRoundCompleted={(value) => {
+              const newRound: RoundSummary = {
+                roundNumber: completedRounds.length + 1,
+                shotsTaken: value,
+              };
+              setCompletedRounds((prev) => [...prev, newRound]);
+              setTotalArrowsShot((prev) => prev + value);
+            }}
+            arrowsPerRound={arrowsPerRound}
+          />
         )}
+        <TrainingFooter roundsPassed={completedRounds.length} arrowsShot={totalArrowsShot} />
 
         <View className="mt-3 flex-row gap-2">
           <Button variant="outline" className="flex-1" onPress={onCancelTraining}>
@@ -193,12 +139,3 @@ export default function TrainingInProgressScreen() {
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  scoreButtonRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginTop: 16,
-    gap: 8,
-  },
-});

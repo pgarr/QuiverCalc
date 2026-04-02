@@ -1,47 +1,28 @@
 import type { TrainingRecord } from '@/lib/database';
-import type { TrainingScoresPayload } from '@/lib/training-scores';
-
-export function parseTrainingScoresPayload(scores: string): TrainingScoresPayload | null {
-  try {
-    const parsed: unknown = JSON.parse(scores);
-    if (
-      parsed &&
-      typeof parsed === 'object' &&
-      'version' in parsed &&
-      (parsed as { version: unknown }).version === 1 &&
-      'pointsMode' in parsed
-    ) {
-      return parsed as TrainingScoresPayload;
-    }
-  } catch {
-    // ignore
-  }
-  return null;
-}
 
 export function getTrainingListStats(record: TrainingRecord): {
   totalShots: number;
-  avgPointsPerRound: number | null;
+  avgPointsPerShot?: number;
 } {
-  const payload = parseTrainingScoresPayload(record.scores);
-  if (!payload) {
-    return { totalShots: 0, avgPointsPerRound: null };
-  }
+  if (record.countPoints === 1 && Array.isArray(record.rounds)) {
+    const rounds = record.rounds;
+    const { totalShots, totalPoints } = rounds.reduce(
+      (sum, r) => {
+        return {
+          totalShots: sum.totalShots + r.shotsTaken,
+          totalPoints:
+            sum.totalPoints +
+            (r.shotsScores ? r.shotsScores.reduce((s, score) => s + score, 0) : 0),
+        };
+      },
+      { totalShots: 0, totalPoints: 0 }
+    );
 
-  if (payload.pointsMode && payload.pointsRounds?.length) {
-    const rounds = payload.pointsRounds;
-    const totalShots = rounds.reduce((sum, r) => sum + r.shots.length, 0);
-    const totalPoints = rounds.reduce((sum, r) => sum + r.totalScore, 0);
-    const avgPointsPerRound = totalPoints / rounds.length;
-    return { totalShots, avgPointsPerRound };
+    const avgPointsPerShot = totalShots > 0 ? totalPoints / totalShots : undefined;
+    return { totalShots, avgPointsPerShot };
   }
-
-  if (!payload.pointsMode && payload.noPointsRounds?.length) {
-    const totalShots = payload.noPointsRounds.reduce((sum, r) => sum + r.arrowsShot, 0);
-    return { totalShots, avgPointsPerRound: null };
-  }
-
-  return { totalShots: 0, avgPointsPerRound: null };
+  const totalShots = record.rounds.reduce((sum, r) => sum + r.shotsTaken, 0);
+  return { totalShots };
 }
 
 export function formatTrainingDate(iso: string): string {

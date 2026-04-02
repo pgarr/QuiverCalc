@@ -1,5 +1,5 @@
-import type { PointOption } from '@/lib/training-points';
-import { SCORE_BUTTON_BORDER_WIDTH, SCORE_BUTTON_SIZE } from '@/lib/training-points';
+import type { PointOption } from '@/lib/points-styles';
+import { SCORE_BUTTON_BORDER_WIDTH, SCORE_BUTTON_SIZE } from '@/lib/points-styles';
 import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 type Props = {
