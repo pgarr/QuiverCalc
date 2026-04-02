@@ -32,11 +32,20 @@ export function createTraining(input: {
 }) {
   const scoresJson = JSON.stringify(input.scores ?? []);
 
-  db.runSync(
+  const result = db.runSync(
     `INSERT INTO trainings (distance, arrows_per_round, count_points, scores)
      VALUES (?, ?, ?, ?);`,
     [input.distance, input.arrowsPerRound, input.countPoints ? 1 : 0, scoresJson]
   );
+  return result.lastInsertRowId;
+}
+
+export function deleteTraining(id: number) {
+  db.runSync(`DELETE FROM trainings WHERE id = ?`, [id]);
+}
+
+export function updateTrainingScores(id: number, scoresJson: string) {
+  db.runSync(`UPDATE trainings SET scores = ? WHERE id = ?`, [scoresJson, id]);
 }
 
 export function getTrainings(): TrainingRecord[] {

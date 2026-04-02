@@ -34,7 +34,7 @@ export default function ConfigureNewTrainingScreen() {
 
     try {
       initDatabase();
-      createTraining({
+      const trainingId = createTraining({
         arrowsPerRound: Number(arrowsPerRound),
         distance: Number(distance),
         countPoints,
@@ -44,6 +44,7 @@ export default function ConfigureNewTrainingScreen() {
       router.push({
         pathname: '/training-in-progress',
         params: {
+          trainingId: String(trainingId),
           distance,
           arrowsPerRound,
           countPoints: countPoints ? '1' : '0',
