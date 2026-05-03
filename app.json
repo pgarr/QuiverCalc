@@ -23,6 +23,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
+      "package": "com.pgarr.quivercalc",
       "versionCode": 2
     },
     "web": {
