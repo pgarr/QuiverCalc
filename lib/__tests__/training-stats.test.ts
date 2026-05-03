@@ -39,10 +39,16 @@ describe('getTrainingListStats', () => {
 
 describe('formatTrainingDate', () => {
   it('should format valid ISO string', () => {
+    const original = Date.prototype.toLocaleString;
+    const spy = jest
+      .spyOn(Date.prototype, 'toLocaleString')
+      .mockImplementation(function (locales, options) {
+        return original.call(this, 'en-US', { ...options, timeZone: 'UTC' });
+      });
     const iso = '2023-01-01T12:00:00Z';
     const result = formatTrainingDate(iso);
-    expect(result).not.toBe('—');
-    expect(result).toMatch(/\d+ \w+ \d+, \d+:\d+/);
+    expect(result).toBe('Jan 1, 2023, 12:00 PM');
+    spy.mockRestore();
   });
 
   it('should return — for invalid date', () => {
