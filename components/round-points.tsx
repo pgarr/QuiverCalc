@@ -1,5 +1,5 @@
 import { POINT_OPTIONS } from '@/lib/points-styles';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { TrainingScoreButton } from './training-score-button';
 import { Text } from '@/components/ui/text';
 import { useCallback, useState } from 'react';
