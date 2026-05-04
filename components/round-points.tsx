@@ -3,6 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import { TrainingScoreButton } from './training-score-button';
 import { Text } from '@/components/ui/text';
 import { useCallback, useState } from 'react';
+import { TrainingScoreLabel } from './training-score-label';
 
 export const RoundPoints = ({
   arrowsPerRound,
@@ -42,6 +43,12 @@ export const RoundPoints = ({
       <Text variant="muted" className="mt-2">
         Current round: {scores.length}/{arrowsPerRound || '-'} shots
       </Text>
+
+      <View style={styles.scoresContainer}>
+        {scores.map((score, index) => (
+          <TrainingScoreLabel score={score} key={index} />
+        ))}
+      </View>
     </>
   );
 };
@@ -51,6 +58,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     marginTop: 16,
+    gap: 8,
+  },
+  scoresContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: 8,
     gap: 8,
   },
 });

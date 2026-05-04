@@ -51,7 +51,6 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 18,
     fontWeight: '700',
-    // Prevent themed Text from shrinking on some platforms
     includeFontPadding: false,
   },
 });
