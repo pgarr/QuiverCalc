@@ -24,6 +24,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
+      "assets": ["./adi-registration.properties"],
       "package": "com.pgarr.quivercalc",
       "versionCode": 6
     },
