@@ -2,7 +2,7 @@
   "expo": {
     "name": "QuiverCalc",
     "slug": "quivercalc",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "QuiverCalc",
@@ -24,7 +24,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.pgarr.quivercalc",
-      "versionCode": 3
+      "versionCode": 4
     },
     "web": {
       "bundler": "metro",
@@ -44,6 +44,6 @@
       }
     },
     "owner": "pgarr",
-    "runtimeVersion": "1.0.3"
+    "runtimeVersion": "1.0.4"
   }
 }

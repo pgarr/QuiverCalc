@@ -39,3 +39,11 @@ yarn-error.*
 
 expo-env.d.ts
 # @end expo-cli
+
+# Native build output
+android/
+ios/
+
+# Claude Code
+.claude/skills/
+*.local.json
