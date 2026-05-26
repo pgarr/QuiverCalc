@@ -1,12 +1,12 @@
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
+import { useMemo, useState } from 'react';
+import { Alert, ScrollView, View } from 'react-native';
 import { RoundNoPoints } from '@/components/round-no-points';
 import { RoundPoints } from '@/components/round-points';
 import { TrainingFooter } from '@/components/training-footer';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { deleteTraining, initDatabase, RoundSummary, updateTrainingRounds } from '@/lib/database';
-import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { useMemo, useState } from 'react';
-import { Alert, ScrollView, View } from 'react-native';
 
 export default function TrainingInProgressScreen() {
   const router = useRouter();
