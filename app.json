@@ -2,7 +2,7 @@
   "expo": {
     "name": "QuiverCalc",
     "slug": "quivercalc",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "QuiverCalc",
@@ -16,7 +16,8 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.pgarr.quivercalc"
     },
     "android": {
       "adaptiveIcon": {
@@ -24,7 +25,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.pgarr.quivercalc",
-      "versionCode": 5
+      "versionCode": 6
     },
     "web": {
       "bundler": "metro",
@@ -44,6 +45,9 @@
       }
     },
     "owner": "pgarr",
-    "runtimeVersion": "1.0.5"
+    "runtimeVersion": "1.0.6",
+    "updates": {
+      "url": "https://u.expo.dev/c1e4915d-b00f-406b-9be0-94e98aed7b96"
+    }
   }
 }
