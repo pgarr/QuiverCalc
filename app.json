@@ -33,8 +33,7 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      "expo-router",
-      "./plugins/withNotifee"
+      "expo-router"
     ],
     "experiments": {
       "typedRoutes": true

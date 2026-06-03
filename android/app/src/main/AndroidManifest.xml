@@ -20,7 +20,6 @@
     <meta-data android:name="expo.modules.updates.EXPO_UPDATES_CHECK_ON_LAUNCH" android:value="ALWAYS"/>
     <meta-data android:name="expo.modules.updates.EXPO_UPDATES_LAUNCH_WAIT_MS" android:value="0"/>
     <meta-data android:name="expo.modules.updates.EXPO_UPDATE_URL" android:value="https://u.expo.dev/c1e4915d-b00f-406b-9be0-94e98aed7b96"/>
-    <service android:name="app.notifee.core.ForegroundService" android:exported="false" android:foregroundServiceType="dataSync" tools:replace="android:foregroundServiceType"/>
     <service android:name=".TrainingForegroundService" android:exported="false" android:foregroundServiceType="dataSync"/>
     <receiver android:name=".TrainingNotificationReceiver" android:exported="false">
       <intent-filter>
