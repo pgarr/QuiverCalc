@@ -9,7 +9,6 @@ dist/
 web-build/
 
 # Native
-android/
 ios/
 *.orig.*
 *.jks
@@ -43,7 +42,6 @@ expo-env.d.ts
 # @end expo-cli
 
 # Native build output
-android/
 ios/
 
 # Claude Code
