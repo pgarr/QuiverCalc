@@ -61,7 +61,10 @@ export default function TrainingInProgressScreen() {
     }
     try {
       initDatabase();
-      updateTrainingRounds(trainingId, completedRounds);
+      const roundsToSave = isCountPointsEnabled
+        ? completedRounds
+        : [{ roundNumber: 1, shotsTaken: totalArrowsShot }];
+      updateTrainingRounds(trainingId, roundsToSave);
 
       router.replace('/');
     } catch {
@@ -114,18 +117,17 @@ export default function TrainingInProgressScreen() {
           </>
         ) : (
           <RoundNoPoints
+            arrowsPerRound={arrowsPerRound}
             onRoundCompleted={(value) => {
-              const newRound: RoundSummary = {
-                roundNumber: completedRounds.length + 1,
-                shotsTaken: value,
-              };
-              setCompletedRounds((prev) => [...prev, newRound]);
               setTotalArrowsShot((prev) => prev + value);
             }}
-            arrowsPerRound={arrowsPerRound}
           />
         )}
-        <TrainingFooter roundsPassed={completedRounds.length} arrowsShot={totalArrowsShot} />
+        <TrainingFooter
+          roundsPassed={completedRounds.length}
+          arrowsShot={totalArrowsShot}
+          showRounds={isCountPointsEnabled}
+        />
 
         <View className="mt-3 flex-row gap-2">
           <Button variant="outline" className="flex-1" onPress={onCancelTraining}>

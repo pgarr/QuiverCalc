@@ -1,5 +1,5 @@
 import { POINT_OPTIONS } from '@/lib/points-styles';
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { TrainingScoreButton } from './training-score-button';
 import { Text } from '@/components/ui/text';
 import { useCallback, useState } from 'react';
@@ -46,7 +46,11 @@ export const RoundPoints = ({
 
       <View style={styles.scoresContainer}>
         {scores.map((score, index) => (
-          <TrainingScoreLabel score={score} key={index} />
+          <Pressable
+            key={index}
+            onLongPress={() => setScores((prev) => prev.filter((_, i) => i !== index))}>
+            <TrainingScoreLabel score={score} />
+          </Pressable>
         ))}
       </View>
     </>

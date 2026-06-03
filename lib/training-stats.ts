@@ -21,7 +21,9 @@ export function getTrainingListStats(record: TrainingRecord): {
     const avgPointsPerShot = totalShots > 0 ? totalPoints / totalShots : undefined;
     return { totalShots, avgPointsPerShot };
   }
-  const totalShots = record.rounds.reduce((sum, r) => sum + r.shotsTaken, 0);
+  const totalShots = Array.isArray(record.rounds)
+    ? record.rounds.reduce((sum, r) => sum + r.shotsTaken, 0)
+    : 0;
   return { totalShots };
 }
 

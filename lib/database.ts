@@ -24,7 +24,7 @@ export function initDatabase() {
       distance REAL NOT NULL,
       arrows_per_round INTEGER NOT NULL,
       count_points INTEGER NOT NULL,
-      rounds TEXT NOT NULL DEFAULT '{}',
+      rounds TEXT NOT NULL DEFAULT '[]',
       created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
     );
   `);
@@ -36,7 +36,7 @@ export function createTraining(input: {
   countPoints: boolean;
   rounds?: RoundSummary[];
 }) {
-  const roundsJson = JSON.stringify(input.rounds ?? {});
+  const roundsJson = JSON.stringify(input.rounds ?? []);
   const createdAt = new Date().toISOString();
 
   const result = db.runSync(
@@ -52,7 +52,7 @@ export function deleteTraining(id: number) {
 }
 
 export function updateTrainingRounds(id: number, rounds: RoundSummary[]) {
-  const roundsJson = JSON.stringify(rounds ?? {});
+  const roundsJson = JSON.stringify(rounds ?? []);
   db.runSync(`UPDATE trainings SET rounds = ? WHERE id = ?`, [roundsJson, id]);
 }
 
