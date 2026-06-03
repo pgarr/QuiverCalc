@@ -1,7 +1,7 @@
 {
   "name": "QuiverCalc",
   "main": "expo-router/entry",
-  "version": "1.0.7",
+  "version": "1.1.0",
   "scripts": {
     "prebuild": "expo prebuild --clean",
     "dev": "expo start",
