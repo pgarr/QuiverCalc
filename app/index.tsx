@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
-import { getTrainings, initDatabase } from '@/lib/database';
+import { getActiveTraining, getTrainings, initDatabase } from '@/lib/database';
 import { formatTrainingDate, getTrainingListStats } from '@/lib/training-stats';
 import { useFocusEffect } from '@react-navigation/native';
 import { Stack, useRouter } from 'expo-router';
@@ -17,8 +17,23 @@ export default function HomeScreen() {
   useFocusEffect(
     useCallback(() => {
       initDatabase();
+
+      const active = getActiveTraining();
+      if (active) {
+        router.replace({
+          pathname: '/training-in-progress',
+          params: {
+            trainingId: String(active.id),
+            distance: String(active.distance),
+            arrowsPerRound: String(active.arrowsPerRound),
+            countPoints: active.countPoints ? '1' : '0',
+          },
+        });
+        return;
+      }
+
       setTrainings(getTrainings());
-    }, [])
+    }, [router])
   );
 
   return (

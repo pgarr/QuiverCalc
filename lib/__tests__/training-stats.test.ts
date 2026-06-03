@@ -1,10 +1,17 @@
 import { getTrainingListStats, formatTrainingDate } from '../training-stats';
 import type { TrainingRecord } from '../database';
 
+const BASE: Pick<TrainingRecord, 'id' | 'currentProgress' | 'status' | 'createdAt'> = {
+  id: 1,
+  currentProgress: { totalShots: 0, completedRounds: [], currentRoundScores: [] },
+  status: 'completed',
+  createdAt: '2023-01-01T00:00:00Z',
+};
+
 describe('getTrainingListStats', () => {
   it('should calculate totalShots and avgPointsPerShot when countPoints is 1', () => {
     const record: TrainingRecord = {
-      id: 1,
+      ...BASE,
       distance: 10,
       arrowsPerRound: 3,
       countPoints: 1,
@@ -12,7 +19,6 @@ describe('getTrainingListStats', () => {
         { roundNumber: 1, shotsTaken: 3, shotsScores: [10, 9, 8] },
         { roundNumber: 2, shotsTaken: 3, shotsScores: [7, 6, 5] },
       ],
-      createdAt: '2023-01-01T00:00:00Z',
     };
     const result = getTrainingListStats(record);
     expect(result.totalShots).toBe(6);
@@ -21,7 +27,7 @@ describe('getTrainingListStats', () => {
 
   it('should calculate only totalShots when countPoints is not 1', () => {
     const record: TrainingRecord = {
-      id: 1,
+      ...BASE,
       distance: 10,
       arrowsPerRound: 3,
       countPoints: 0,
@@ -29,7 +35,6 @@ describe('getTrainingListStats', () => {
         { roundNumber: 1, shotsTaken: 3 },
         { roundNumber: 2, shotsTaken: 3 },
       ],
-      createdAt: '2023-01-01T00:00:00Z',
     };
     const result = getTrainingListStats(record);
     expect(result.totalShots).toBe(6);

@@ -2,23 +2,19 @@ import { POINT_OPTIONS } from '@/lib/points-styles';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { TrainingScoreButton } from './training-score-button';
 import { Text } from '@/components/ui/text';
-import { useCallback, useState } from 'react';
 import { TrainingScoreLabel } from './training-score-label';
 
 export const RoundPoints = ({
   arrowsPerRound,
+  scores,
   onRoundCompleted,
+  onScoresChanged,
 }: {
   arrowsPerRound: number;
+  scores: number[];
   onRoundCompleted: (scores: number[]) => void;
+  onScoresChanged: (scores: number[]) => void;
 }) => {
-  const [scores, setScores] = useState<number[]>([]);
-
-  const onRoundFinish = useCallback(() => {
-    onRoundCompleted(scores);
-    setScores([]);
-  }, [onRoundCompleted, scores]);
-
   return (
     <>
       <View style={styles.scoreButtonRow}>
@@ -27,14 +23,12 @@ export const RoundPoints = ({
             key={`point-${option.label}`}
             option={option}
             onPress={() => {
-              setScores((prev) => {
-                const newScores = [...prev, option.value];
-                if (newScores.length === arrowsPerRound) {
-                  onRoundFinish();
-                  return [];
-                }
-                return newScores;
-              });
+              const newScores = [...scores, option.value];
+              if (newScores.length === arrowsPerRound) {
+                onRoundCompleted(newScores);
+              } else {
+                onScoresChanged(newScores);
+              }
             }}
           />
         ))}
@@ -48,7 +42,7 @@ export const RoundPoints = ({
         {scores.map((score, index) => (
           <Pressable
             key={index}
-            onLongPress={() => setScores((prev) => prev.filter((_, i) => i !== index))}>
+            onLongPress={() => onScoresChanged(scores.filter((_, i) => i !== index))}>
             <TrainingScoreLabel score={score} />
           </Pressable>
         ))}

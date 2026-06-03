@@ -1,6 +1,6 @@
 {
   "name": "QuiverCalc",
-  "main": "expo-router/entry",
+  "main": "./index",
   "version": "1.1.0",
   "scripts": {
     "prebuild": "expo prebuild --clean",
@@ -16,6 +16,7 @@
     "bump:major": "scripts/bump-version.sh major"
   },
   "dependencies": {
+    "@notifee/react-native": "^9.1.8",
     "@react-navigation/native": "^7.0.0",
     "@rn-primitives/portal": "~1.4.0",
     "@rn-primitives/slot": "^1.4.0",

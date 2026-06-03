@@ -3,6 +3,12 @@ import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Text } from '@/components/ui/text';
 import { createTraining, initDatabase } from '@/lib/database';
+import {
+  createNotificationChannel,
+  DEFAULT_TRAINING_PROGRESS,
+  displayTrainingNotification,
+  requestPermission,
+} from '@/lib/training-notification';
 import { Stack, useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Alert, View } from 'react-native';
@@ -26,33 +32,56 @@ export default function ConfigureNewTrainingScreen() {
     );
   }, [arrowsPerRound, distance]);
 
-  const onStartTraining = () => {
+  const onStartTraining = async () => {
     if (!isValid) {
       Alert.alert('Invalid values', 'Please enter valid arrows per round and distance values.');
       return;
     }
 
+    let trainingId: number;
     try {
       initDatabase();
-      const trainingId = createTraining({
+      trainingId = createTraining({
         arrowsPerRound: Number(arrowsPerRound),
         distance: Number(distance),
         countPoints,
-        scores: [],
       });
-
-      router.push({
-        pathname: '/training-in-progress',
-        params: {
-          trainingId: String(trainingId),
-          distance,
-          arrowsPerRound,
-          countPoints: countPoints ? '1' : '0',
-        },
-      });
-    } catch {
+    } catch (e) {
+      console.error('Failed to create training:', e);
       Alert.alert('Database error', 'Could not save training. Please try again.');
+      return;
     }
+
+    // Notification is best-effort — training starts regardless
+    try {
+      await requestPermission();
+      await createNotificationChannel();
+      await displayTrainingNotification(
+        {
+          id: trainingId,
+          distance: Number(distance),
+          arrowsPerRound: Number(arrowsPerRound),
+          countPoints: countPoints ? 1 : 0,
+          rounds: [],
+          currentProgress: DEFAULT_TRAINING_PROGRESS,
+          status: 'active',
+          createdAt: new Date().toISOString(),
+        },
+        DEFAULT_TRAINING_PROGRESS
+      );
+    } catch (e) {
+      console.warn('Training notification could not be started:', e);
+    }
+
+    router.push({
+      pathname: '/training-in-progress',
+      params: {
+        trainingId: String(trainingId),
+        distance,
+        arrowsPerRound,
+        countPoints: countPoints ? '1' : '0',
+      },
+    });
   };
 
   return (
